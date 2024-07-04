@@ -1,27 +1,32 @@
-import { Todo } from "../interface";
+import { useDeleteTodoMutation } from "@/queries/useDeleteTodoMutation";
+import { QUERY_KEY, useGetTodoQuery } from "@/queries/useGetTodoQuery";
+import { usePutTodoMutation } from "@/queries/usePutTodoMutation";
+import { queryClient } from "@/queryClient";
 
-interface TodoListProps {
-  list?: Todo[];
-  onToggleTodo: (id: number) => void;
-  onDeleteTodo: (id: number) => void;
-}
+export const TodoList = () => {
+  const { data } = useGetTodoQuery();
+  const { mutate: deleteTodo } = useDeleteTodoMutation({
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: QUERY_KEY });
+    },
+  });
+  const { mutate: putTodo } = usePutTodoMutation({
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: QUERY_KEY });
+    },
+  });
 
-export const TodoList = ({
-  list,
-  onToggleTodo,
-  onDeleteTodo,
-}: TodoListProps) => {
   return (
     <ul>
-      {list?.map(({ checked, content, id }) => (
+      {data?.data?.map(({ checked, content, id }) => (
         <li key={id}>
           <input
-            onChange={() => onToggleTodo(id)}
+            onChange={() => putTodo({ checked: !checked, content, id })}
             type="checkbox"
             checked={checked}
           />
           {content}
-          <button onClick={() => onDeleteTodo(id)}>X</button>
+          <button onClick={() => deleteTodo(id)}>X</button>
         </li>
       ))}
     </ul>

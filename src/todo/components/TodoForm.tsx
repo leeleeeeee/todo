@@ -1,16 +1,21 @@
 import { FormEvent, useRef } from "react";
-import { Todo } from "../interface";
+import { usePostTodoMutation } from "@/queries/usePostTodoMutation";
+import { queryClient } from "@/queryClient";
+import { QUERY_KEY } from "@/queries/useGetTodoQuery";
 
-interface TodoFormProps {
-  onSubmit: (e: FormEvent<HTMLFormElement>, newTodo: Todo) => void;
-}
-
-export const TodoForm = ({ onSubmit }: TodoFormProps) => {
+export const TodoForm = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const { mutate } = usePostTodoMutation({
+    onSuccess: () => {
+      queryClient.refetchQueries({ queryKey: QUERY_KEY });
+    },
+  });
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!inputRef.current) return;
-    onSubmit(e, {
+    mutate({
       checked: false,
       content: inputRef.current.value || "",
       id: Date.now(),
