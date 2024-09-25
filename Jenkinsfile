@@ -8,7 +8,7 @@ pipeline {
         
         stage('github-clone') {
             steps {
-                git branch: 'main', credentialsId: 'github-token', url: '{REPOSITORY URL}'
+                git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/leeleeeeee/todo.git'
             }
         }
 
